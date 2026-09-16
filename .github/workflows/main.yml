@@ -41,6 +41,13 @@ jobs:
             "platforms;android-34" \
             "build-tools;34.0.0"
 
+      - name: Ensure Gradle wrapper exists
+        run: |
+          if [ ! -f "./gradlew" ]; then
+            echo "gradlew not found in repo — generating it with the runner's Gradle."
+            gradle wrapper --gradle-version 8.4
+          fi
+
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
