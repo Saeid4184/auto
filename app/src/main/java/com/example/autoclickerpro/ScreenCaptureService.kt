@@ -55,6 +55,10 @@ class ScreenCaptureService : Service() {
         // backpressure نشه.
         private const val MIN_FRAME_INTERVAL_MS = 200L
 
+        // نگهبانِ گیرکردن: هر چند وقت چک کنه، و بعد از چند ثانیه بی‌فریمی، متوقف کنه.
+        private const val WATCHDOG_INTERVAL_MS = 2000L
+        private const val STALL_THRESHOLD_MS = 5000L
+
         @Volatile
         var instance: ScreenCaptureService? = null
             private set
@@ -67,6 +71,40 @@ class ScreenCaptureService : Service() {
 
     @Volatile
     private var lastFrameDecodeAtMs = 0L
+
+    // فاز ۱۶: نگهبانِ گیرکردن. اگه پایپ‌لاینِ ضبط صفحه فعال باشه ولی مدت زیادی
+    // (STALL_THRESHOLD_MS) هیچ فریم جدیدی موفق به دیکد شدن نشه — که دقیقاً
+    // همون حالتیه که latestFrame برای همیشه روی یک فریمِ قدیمی «قفل» می‌مونه —
+    // به‌جای اینکه بی‌صدا برای همیشه گیر بمونه، منابع (VirtualDisplay/ImageReader)
+    // رو آزاد می‌کنیم و به کاربر اطلاع می‌دیم که باید دوباره فعالش کنه؛ چون
+    // منابعِ Surface/Display که برای مدت طولانی به‌صورت گیرکرده باز می‌مونن،
+    // خودشون می‌تونن باعث بی‌ثباتیِ بیشتر (تا حد کرش کامل سیستم) بشن.
+    @Volatile
+    private var lastSuccessfulFrameAtMs = 0L
+    @Volatile
+    private var stallToastShown = false
+    private val mainHandler = Handler(android.os.Looper.getMainLooper())
+    private val stallWatchdog = object : Runnable {
+        override fun run() {
+            if (virtualDisplay == null) return // ضبط دیگه فعال نیست، نگهبان لازم نیست
+            val idleMs = System.currentTimeMillis() - lastSuccessfulFrameAtMs
+            if (idleMs > STALL_THRESHOLD_MS) {
+                Log.e(TAG, "پایپ‌لاینِ ضبط صفحه $idleMs میلی‌ثانیه هیچ فریمی نداده — در حال آزادسازی منابع")
+                if (!stallToastShown) {
+                    stallToastShown = true
+                    android.widget.Toast.makeText(
+                        this@ScreenCaptureService,
+                        "ضبط صفحه گیر کرد — لطفاً از منو غیرفعال/فعالش کن",
+                        android.widget.Toast.LENGTH_LONG
+                    ).show()
+                }
+                stopCapture()
+                latestFrame = null
+                return
+            }
+            mainHandler.postDelayed(this, WATCHDOG_INTERVAL_MS)
+        }
+    }
 
     private var mediaProjection: MediaProjection? = null
     private var virtualDisplay: VirtualDisplay? = null
@@ -134,6 +172,8 @@ class ScreenCaptureService : Service() {
     private fun startCapture(resultCode: Int, resultData: Intent) {
         stopCapture() // اگه از قبل در حال اجرا بود، اول تمیزش کن
         lastFrameDecodeAtMs = 0L // تا اولین فریمِ همین سشن بدون تاخیرِ throttle دیکد بشه
+        lastSuccessfulFrameAtMs = System.currentTimeMillis()
+        stallToastShown = false
 
         val projectionManager =
             getSystemService(MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
@@ -153,7 +193,7 @@ class ScreenCaptureService : Service() {
         val height = metrics.heightPixels
         val density = metrics.densityDpi
 
-        val reader = ImageReader.newInstance(width, height, android.graphics.PixelFormat.RGBA_8888, 2)
+        val reader = ImageReader.newInstance(width, height, android.graphics.PixelFormat.RGBA_8888, 4)
         imageReader = reader
 
         // باگ رفع‌شده: قبلاً Handler پاس داده‌شده null بود که یعنی این listener
@@ -182,6 +222,7 @@ class ScreenCaptureService : Service() {
                     if (now - lastFrameDecodeAtMs >= MIN_FRAME_INTERVAL_MS) {
                         latestFrame = imageToBitmap(image, width, height)
                         lastFrameDecodeAtMs = now
+                        lastSuccessfulFrameAtMs = now
                     }
                 } finally {
                     image.close()
@@ -197,6 +238,9 @@ class ScreenCaptureService : Service() {
             DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
             reader.surface, null, null
         )
+
+        mainHandler.removeCallbacks(stallWatchdog)
+        mainHandler.postDelayed(stallWatchdog, WATCHDOG_INTERVAL_MS)
 
         Log.d(TAG, "ضبط صفحه شروع شد ($width x $height)")
     }
@@ -223,6 +267,7 @@ class ScreenCaptureService : Service() {
     }
 
     fun stopCapture() {
+        mainHandler.removeCallbacks(stallWatchdog)
         virtualDisplay?.release()
         virtualDisplay = null
         imageReader?.close()
