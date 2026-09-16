@@ -1,0 +1,9 @@
+<resources>
+    <!-- فقط رنگ‌های سطح/پس‌زمینه بازنویسی می‌شن؛ رنگ‌های برند همون می‌مونن
+         تا هویتِ اپ در حالت شب هم حفظ بشه. -->
+    <color name="app_background">#121214</color>
+    <color name="app_surface">#1E1E22</color>
+    <color name="app_on_surface">#F2F2F5</color>
+    <color name="app_on_surface_variant">#B8B8C2</color>
+    <color name="app_outline">#3A3A40</color>
+</resources>

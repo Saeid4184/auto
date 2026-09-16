@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/app_background">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:title="شمارنده‌ها"
+        app:titleTextColor="@color/on_primary"
+        app:navigationIcon="?attr/homeAsUpIndicator" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="شمارنده‌ها با اکشنِ «افزایش/کاهش شمارنده» روی قوانین ساخته و تغییر می‌کنن؛ اینجا فقط می‌تونی مقدارِ فعلی رو ببینی یا صفر/حذفشون کنی. برای ساختنِ دستیِ یک شمارنده‌ی جدید (مثلاً برای شروع از یک عدد خاص)، از دکمه‌ی زیر استفاده کن."
+            android:textSize="13sp"
+            android:textColor="@color/app_on_surface_variant"
+            android:layout_marginBottom="12dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnNewCounter"
+            style="@style/Widget.AutoClickerPro.Button.Outlined"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="+ شمارنده‌ی جدید" />
+
+        <TextView
+            android:id="@+id/tvEmptyCounters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="هنوز هیچ شمارنده‌ای وجود نداره."
+            android:textSize="13sp"
+            android:textColor="@color/app_on_surface_variant"
+            android:visibility="gone"
+            android:layout_marginBottom="8dp" />
+
+        <ListView
+            android:id="@+id/listCounters"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:divider="@null"
+            android:dividerHeight="0dp" />
+
+    </LinearLayout>
+</LinearLayout>

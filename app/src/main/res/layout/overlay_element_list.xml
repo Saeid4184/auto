@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/app_surface"
+    android:padding="12dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="یک المان را برای ساخت قانون انتخاب کنید"
+        android:textColor="@color/app_on_surface"
+        android:textStyle="bold"
+        android:textSize="15sp"
+        android:paddingBottom="8dp" />
+
+    <ListView
+        android:id="@+id/listElements"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/app_background" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnCancelPicker"
+        style="@style/Widget.AutoClickerPro.Button.Outlined"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="انصراف" />
+
+</LinearLayout>

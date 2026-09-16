@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- فاز ۱۶: طبق درخواستِ کاربر، اندازه‌ی دکمه‌ی شناور تقریباً ۱.۶ برابر شد
+     (۵۶dp → ۹۰dp) چون خیلی ریز بود. اندازه‌ی فونت هم متناسب بزرگ‌تر شد. -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="90dp"
+    android:layout_height="90dp"
+    android:background="@drawable/overlay_button_bg"
+    android:gravity="center"
+    android:text="+"
+    android:textColor="@color/white"
+    android:textSize="46sp"
+    android:textStyle="bold"
+    android:elevation="10dp" />

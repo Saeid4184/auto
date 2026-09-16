@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- برای رسم دکمه شناور روی سایر اپ‌ها -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <!-- برای اینکه سرویس در پس‌زمینه با اعلان دائمی زنده بمونه -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <!-- در فاز ۳ برای گرفتن اسکرین‌شات لازم می‌شه -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+    <!-- باگ رفع‌شده: بدون این مجوز، در اندروید ۱۳+ اعلانِ سرویس‌های فورگراند
+         اصلاً نمایش داده نمی‌شه (خودِ سرویس درست کار می‌کنه، ولی کاربر اعلانش
+         رو نمی‌بینه که گیج‌کننده‌ست). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- فاز ۱۵: بدون این <queries>، از اندروید ۱۱ (API 30) به بعد،
+         packageManager.getLaunchIntentForPackage(pkg) برای اکشنِ «اجرای یک
+         اپِ دیگه» روی اپ‌های دیگه معمولاً null برمی‌گردونه — قوانینِ
+         package visibility اجازه نمی‌دن یک اپ بدون اعلامِ صریح، اپ‌های
+         دیگه‌ی نصب‌شده رو "ببینه". چون نمی‌دونیم کاربر کدوم پکیج رو (که
+         خودش موقعِ ساختنِ قانون تایپ می‌کنه) هدف می‌گیره، به‌جای اعلامِ یک
+         پکیجِ خاص، این کوئریِ عمومیِ استانداردِ گوگل («هر اپی که قابلِ
+         اجرا از لانچره») رو اعلام می‌کنیم — این با سیاست‌های Play Store هم
+         مشکلی نداره (برخلاف مجوزِ QUERY_ALL_PACKAGES که محدودیتِ سختی داره). -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+        </intent>
+    </queries>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher_simple"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.AutoClickerPro"
+        android:supportsRtl="true">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".RulesActivity"
+            android:exported="false"
+            android:label="@string/btn_manage_rules" />
+
+        <activity
+            android:name=".ScenariosActivity"
+            android:exported="false"
+            android:label="@string/btn_manage_scenarios" />
+
+        <activity
+            android:name=".RecordingsActivity"
+            android:exported="false"
+            android:label="@string/btn_manage_recordings" />
+
+        <activity
+            android:name=".RunLogActivity"
+            android:exported="false"
+            android:label="@string/btn_view_run_log" />
+
+        <activity
+            android:name=".SimpleModeActivity"
+            android:exported="false"
+            android:label="@string/btn_simple_mode" />
+
+        <activity
+            android:name=".CountersActivity"
+            android:exported="false"
+            android:label="@string/btn_view_counters" />
+
+        <!-- سرویسی که واقعاً کلیک/سوایپ رو شبیه‌سازی می‌کنه -->
+        <service
+            android:name=".ClickAccessibilityService"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
+
+        <!-- سرویس دکمه شناور و منطق زمان‌بندی کلیک -->
+        <service
+            android:name=".OverlayService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="auto_click_automation_tool" />
+        </service>
+
+        <!-- فاز ۳: سرویس ضبط صفحه (MediaProjection) برای تشخیص تصویری با OpenCV -->
+        <service
+            android:name=".ScreenCaptureService"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection" />
+
+    </application>
+</manifest>

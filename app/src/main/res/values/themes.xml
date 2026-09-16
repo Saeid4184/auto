@@ -1,0 +1,94 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.AutoClickerPro" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/brand_primary</item>
+        <item name="colorPrimaryVariant">@color/brand_primary_dark</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorSecondary">@color/brand_secondary</item>
+        <item name="colorSecondaryVariant">@color/brand_secondary_dark</item>
+        <item name="colorOnSecondary">@color/on_secondary</item>
+        <item name="colorError">@color/brand_error</item>
+
+        <item name="android:colorBackground">@color/app_background</item>
+        <item name="colorSurface">@color/app_surface</item>
+        <item name="colorOnSurface">@color/app_on_surface</item>
+
+        <!-- گرد کردنِ سراسریِ گوشه‌ها روی هر ویجتِ Material که از این
+             shapeAppearanceهای نام‌گذاری‌شده استفاده کنه (دکمه، کارت، دیالوگ،
+             TextInputLayout و...) — به‌جای گوشه‌های تیزِ پیش‌فرض. -->
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.AutoClickerPro.Small</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.AutoClickerPro.Medium</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.AutoClickerPro.Large</item>
+
+        <item name="materialButtonStyle">@style/Widget.AutoClickerPro.Button</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.AutoClickerPro.Dialog</item>
+        <item name="alertDialogTheme">@style/ThemeOverlay.AutoClickerPro.Dialog</item>
+        <item name="toolbarStyle">@style/Widget.AutoClickerPro.Toolbar</item>
+
+        <item name="android:statusBarColor">@color/brand_primary_dark</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="23">false</item>
+    </style>
+
+    <!-- دکمه‌ی پرِ گردگوشه؛ همه‌ی <Button>های معمولیِ اپ (چون تم
+         MaterialComponentsه و اکتیویتی‌ها AppCompatActivityن) خودکار با این
+         استایل رندر می‌شن، بدون نیاز به تغییرِ تک‌تکِ layoutها. -->
+    <style name="Widget.AutoClickerPro.Button" parent="Widget.MaterialComponents.Button">
+        <item name="cornerRadius">14dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="Widget.AutoClickerPro.Button.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="cornerRadius">14dp</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="Widget.AutoClickerPro.Button.Text" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="Widget.AutoClickerPro.Button.Text.Destructive" parent="Widget.AutoClickerPro.Button.Text">
+        <item name="android:textColor">@color/brand_error</item>
+        <item name="rippleColor">@color/brand_error</item>
+    </style>
+
+    <style name="Widget.AutoClickerPro.Toolbar" parent="Widget.MaterialComponents.Toolbar.Primary">
+        <item name="titleTextColor">@color/on_primary</item>
+    </style>
+
+    <style name="ShapeAppearance.AutoClickerPro.Small" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerSize">12dp</item>
+    </style>
+
+    <style name="ShapeAppearance.AutoClickerPro.Medium" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerSize">18dp</item>
+    </style>
+
+    <style name="ShapeAppearance.AutoClickerPro.Large" parent="ShapeAppearance.MaterialComponents.LargeComponent">
+        <item name="cornerSize">22dp</item>
+    </style>
+
+    <!-- تمِ دیالوگ‌ها: هم برای دیالوگ‌های داخلِ اکتیویتی، هم برای اونایی که
+         OverlayService (یک Service، نه Activity) با یک ContextThemeWrapper
+         نشون می‌ده — همه از این یکی استفاده می‌کنن، برای ظاهرِ یکدست. -->
+    <style name="ThemeOverlay.AutoClickerPro.Dialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.AutoClickerPro.Medium</item>
+        <item name="colorPrimary">@color/brand_primary</item>
+        <item name="colorSecondary">@color/brand_secondary</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.AutoClickerPro.Button.Text</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.AutoClickerPro.Button.Text</item>
+    </style>
+
+    <!-- کارتِ ردیفِ لیست (قانون/سناریو/ضبط/نقطه): سایه‌ی ملایم + گوشه‌ی گرد،
+         به‌جای یک LinearLayoutِ تخت روی پس‌زمینه‌ی خام لیست. -->
+    <style name="Widget.AutoClickerPro.ItemCard" parent="Widget.MaterialComponents.CardView">
+        <item name="cardCornerRadius">16dp</item>
+        <item name="cardElevation">2dp</item>
+        <item name="contentPadding">14dp</item>
+        <item name="android:layout_marginHorizontal">4dp</item>
+        <item name="android:layout_marginVertical">6dp</item>
+    </style>
+
+</resources>

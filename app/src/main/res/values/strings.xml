@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">AutoClicker Pro</string>
+    <string name="accessibility_service_description">این سرویس برای شبیه‌سازی کلیک، درگ و سوایپ در نقاط مشخص‌شده توسط کاربر استفاده می‌شود.</string>
+    <string name="btn_grant_overlay">اجازه نمایش روی سایر برنامه‌ها</string>
+    <string name="btn_grant_accessibility">فعال‌سازی سرویس Accessibility</string>
+    <string name="btn_start_overlay">شروع (نمایش دکمه شناور)</string>
+    <string name="status_ready">همه چیز آماده است</string>
+    <string name="status_need_overlay">نیاز به مجوز نمایش روی سایر برنامه‌ها</string>
+    <string name="status_need_accessibility">نیاز به فعال‌سازی سرویس Accessibility</string>
+    <string name="btn_manage_rules">مدیریت قوانین کلیک</string>
+    <string name="btn_grant_screen_capture">فعال‌سازی ضبط صفحه (برای تشخیص تصویری)</string>
+    <string name="btn_manage_scenarios">مدیریت سناریوها</string>
+    <string name="btn_manage_recordings">ضبط‌های لمسی (ضبط/پخش دقیق)</string>
+    <string name="btn_view_run_log">تاریخچه‌ی اجرا</string>
+    <string name="btn_view_counters">🔢 شمارنده‌ها</string>
+    <string name="btn_simple_mode">🟢 حالت ساده (چند نقطه + فاصله‌ی زمانی)</string>
+</resources>

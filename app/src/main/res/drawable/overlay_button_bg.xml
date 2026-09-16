@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- فاز ۱۴: قبلاً یک دایره‌ی تخت تک‌رنگ بود؛ حالا یک گرادیانِ ملایم +
+     بردرِ سفیدِ نازک، تا حتی روی پس‌زمینه‌های شلوغِ اپ‌های دیگه هم به نظر
+     یک المانِ «شناور»ِ واقعی برسه، نه یک لکه‌ی رنگ. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <gradient
+        android:type="linear"
+        android:angle="315"
+        android:startColor="@color/brand_secondary"
+        android:endColor="@color/brand_secondary_dark" />
+    <stroke
+        android:width="3dp"
+        android:color="#33FFFFFF" />
+</shape>

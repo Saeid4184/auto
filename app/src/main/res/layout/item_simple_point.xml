@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Widget.AutoClickerPro.ItemCard"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardBackgroundColor="@color/app_surface">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <!-- دستگیره‌ی درگ: فقط همین ناحیه startDrag رو صدا می‌زنه، نه کل ردیف —
+             تا کاربر بتونه روی خودِ متن هم اسکرول کنه بدون اینکه ناخواسته درگ شروع بشه. -->
+        <TextView
+            android:id="@+id/tvDragHandle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:padding="8dp"
+            android:text="☰"
+            android:textSize="20sp"
+            android:textColor="@color/app_on_surface_variant" />
+
+        <TextView
+            android:id="@+id/tvSimplePointLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="14sp"
+            android:textColor="@color/app_on_surface" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDeleteSimplePoint"
+            style="@style/Widget.AutoClickerPro.Button.Text.Destructive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="حذف" />
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

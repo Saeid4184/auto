@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/app_background">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:title="@string/app_name"
+        app:titleTextColor="@color/on_primary" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.AutoClickerPro.ItemCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:cardBackgroundColor="@color/app_surface">
+
+                <TextView
+                    android:id="@+id/tvStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:textColor="@color/app_on_surface"
+                    android:text="@string/status_need_overlay" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="۱) راه‌اندازی"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="@color/app_on_surface_variant"
+                android:layout_marginBottom="8dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnGrantOverlay"
+                style="@style/Widget.AutoClickerPro.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="@string/btn_grant_overlay" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnGrantAccessibility"
+                style="@style/Widget.AutoClickerPro.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="@string/btn_grant_accessibility" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnGrantScreenCapture"
+                style="@style/Widget.AutoClickerPro.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:text="@string/btn_grant_screen_capture" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStart"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:enabled="false"
+                android:textSize="16sp"
+                android:text="@string/btn_start_overlay" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="20dp"
+                android:background="@color/app_outline" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="۲) مدیریت"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="@color/app_on_surface_variant"
+                android:layout_marginBottom="8dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSimpleMode"
+                style="@style/Widget.AutoClickerPro.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="@string/btn_simple_mode" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnManageRules"
+                style="@style/Widget.AutoClickerPro.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="@string/btn_manage_rules" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnManageScenarios"
+                style="@style/Widget.AutoClickerPro.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="@string/btn_manage_scenarios" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnManageRecordings"
+                style="@style/Widget.AutoClickerPro.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="@string/btn_manage_recordings" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnViewRunLog"
+                style="@style/Widget.AutoClickerPro.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="@string/btn_view_run_log" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnViewCounters"
+                style="@style/Widget.AutoClickerPro.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="@string/btn_view_counters" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

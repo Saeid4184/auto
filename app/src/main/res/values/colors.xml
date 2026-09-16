@@ -1,0 +1,37 @@
+<resources>
+    <!-- پالتِ برند: قبلاً بنفش/سبزآبیِ پیش‌فرضِ تمپلیتِ Android Studio بود
+         (purple_500/teal_200 بدون هیچ هویت خاصی). این یکی رنگ‌های معنادار
+         داره: ایندیگو برای اکشن‌های اصلی، فیروزه‌ای برای اکشن‌های ثانویه/
+         دکمه‌ی شناور (که باید روی هر پس‌زمینه‌ای — چون همیشه روی یک اپِ دیگه
+         می‌شینه — قابل‌تشخیص بمونه). -->
+    <color name="brand_primary">#4F46E5</color>
+    <color name="brand_primary_dark">#3730A3</color>
+    <color name="brand_secondary">#06B6D4</color>
+    <color name="brand_secondary_dark">#0E7490</color>
+
+    <color name="brand_error">#E53935</color>
+    <color name="brand_success">#2E7D32</color>
+    <color name="brand_warning">#F59E0B</color>
+
+    <color name="on_primary">#FFFFFFFF</color>
+    <color name="on_secondary">#00251A</color>
+
+    <!-- این سه‌تا در values-night/colors.xml بازنویسی می‌شن؛ همه‌ی
+         layoutها/themeها فقط از این اسم‌ها استفاده می‌کنن، نه مقدار مستقیم،
+         تا حالت شب به‌صورت خودکار (بدون هیچ if/else‌ای در کد) کار کنه. -->
+    <color name="app_background">#F3F3F9</color>
+    <color name="app_surface">#FFFFFFFF</color>
+    <color name="app_on_surface">#1B1B1F</color>
+    <color name="app_on_surface_variant">#5C5C66</color>
+    <color name="app_outline">#DEDEE6</color>
+
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+
+    <!-- نام‌های قدیمی به‌عنوان alias نگه داشته شدن، برای هر جایی که قبلاً
+         مستقیم بهشون رفرنس داده شده و از قلم افتاده باشه. -->
+    <color name="purple_500">@color/brand_primary</color>
+    <color name="purple_700">@color/brand_primary_dark</color>
+    <color name="teal_200">@color/brand_secondary</color>
+    <color name="overlay_accent">@color/brand_secondary</color>
+</resources>
