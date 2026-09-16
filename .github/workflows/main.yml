@@ -1,61 +1,47 @@
-name: Build AutoClicker Pro
+name: Android CI Build
 
-# کِی این ورک‌فلو اجرا بشه:
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main, master ]
   pull_request:
-    branches: [ "main" ]
-  workflow_dispatch: {}   # اجازه می‌ده دستی هم از تب Actions بزنیش
+    branches: [ main, master ]
+  workflow_dispatch:
 
 jobs:
   build:
-    name: Build Debug APK
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout کردن کد
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: نصب JDK 17
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: "temurin"
-          java-version: "17"
+          distribution: 'temurin'
+          java-version: '17'
 
-      - name: نصب Android SDK
+      - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install SDK packages
-        run: | 
-          sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0"
-
-      - name: قبول کردن لایسنس‌های Android SDK
+      - name: Accept SDK licenses
         run: yes | sdkmanager --licenses || true
 
-      - name: کش کردن دیپندنسی‌های Gradle (سریع‌تر شدن اجراهای بعدی)
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*') }}
-          restore-keys: |
-            gradle-${{ runner.os }}-
+      - name: Install required SDK packages
+        run: |
+          sdkmanager --install \
+            "platform-tools" \
+            "platforms;android-34" \
+            "build-tools;34.0.0"
 
-      - name: ساختِ Gradle Wrapper
-        # این پروژه فایل gradlew نداره، پس اول خودمون می‌سازیمش
-        run: gradle wrapper --gradle-version 8.4
-
-      - name: اجازه‌ی اجرا به gradlew
+      - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-      - name: ساختِ اپ (Debug APK)
-        run: ./gradlew assembleDebug --stacktrace
+      - name: Build debug APK
+        run: ./gradlew assembleDebug --no-daemon
 
-      - name: آپلود APK به‌عنوان خروجی
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: AutoClickerPro-debug-apk
+          name: autoclickerpro-debug-apk
           path: app/build/outputs/apk/debug/*.apk
-          if-no-files-found: error
