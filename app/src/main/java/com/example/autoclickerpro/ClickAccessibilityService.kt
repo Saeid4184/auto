@@ -436,4 +436,235 @@ class ClickAccessibilityService : AccessibilityService() {
             // فاز ۱۵: این چهارتا هیچ ژستی dispatch نمی‌کنن — x/y همون نقطه‌ای
             // که matchType پیدا کرده رو نگه می‌داره (فقط برای لاگ)، ولی اکشنِ
             // واقعی یک تغییرِ شمارنده یا یک Intent اندرویدیه.
-            ActionType.INCREMENT_COUNTER -> a
+            ActionType.INCREMENT_COUNTER -> applyCounterAction(rule, rule.counterActionDelta)
+            ActionType.DECREMENT_COUNTER -> applyCounterAction(rule, -rule.counterActionDelta)
+            ActionType.RESET_COUNTER -> {
+                val name = rule.counterActionName
+                if (name != null) {
+                    CounterStore.reset(this, name)
+                    Log.i(TAG, "شمارنده‌ی «$name» صفر شد (قانون «${rule.label}»)")
+                } else {
+                    Log.w(TAG, "قانون «${rule.label}» اکشنش ریست‌شمارنده‌ست ولی نامِ شمارنده خالیه")
+                }
+            }
+            ActionType.ANDROID_INTENT -> performAndroidIntentAction(rule)
+        }
+    }
+
+    /** فاز ۱۵: افزایش/کاهشِ یک شمارنده‌ی نام‌دار (delta منفی یعنی کاهش). */
+    private fun applyCounterAction(rule: ClickRule, delta: Int) {
+        val name = rule.counterActionName
+        if (name == null) {
+            Log.w(TAG, "قانون «${rule.label}» اکشنش تغییرِ شمارنده‌ست ولی نامِ شمارنده خالیه")
+            return
+        }
+        val newValue = CounterStore.increment(this, name, delta)
+        Log.i(TAG, "شمارنده‌ی «$name» به $newValue تغییر کرد (قانون «${rule.label}»)")
+    }
+
+    /**
+     * فاز ۱۵ — اکشنِ اندرویدی: باز کردن URL، اجرای یک اپِ دیگه، یا ارسال
+     * broadcast. هرکدوم که خطا بده (مثلاً اپی با اون پکیج نصب نیست، یا
+     * URL نامعتبره)، فقط لاگ می‌شه؛ کل سرویس/حلقه کرش نمی‌کنه.
+     */
+    private fun performAndroidIntentAction(rule: ClickRule) {
+        val target = rule.intentTarget
+        if (target.isNullOrBlank()) {
+            Log.w(TAG, "قانون «${rule.label}» اکشنش Android Intent است ولی مقصد خالیه")
+            return
+        }
+        try {
+            when (rule.intentActionKind) {
+                IntentActionKind.OPEN_URL -> {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(target))
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    startActivity(intent)
+                }
+                IntentActionKind.LAUNCH_APP -> {
+                    val launchIntent = packageManager.getLaunchIntentForPackage(target)
+                    if (launchIntent != null) {
+                        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        startActivity(launchIntent)
+                    } else {
+                        Log.w(TAG, "اپی با پکیجِ «$target» روی این دستگاه پیدا یا قابل‌اجرا نیست")
+                    }
+                }
+                IntentActionKind.SEND_BROADCAST -> {
+                    sendBroadcast(Intent(target))
+                }
+            }
+        } catch (t: Throwable) {
+            Log.e(TAG, "خطا در اجرای اکشنِ اندرویدیِ قانون «${rule.label}»", t)
+        }
+    }
+
+    // ==================== فاز ۳: تشخیص تصویری با OpenCV (fallback) ====================
+
+    /**
+     * فاز ۹: به‌جای همیشه یک فایل الگوی تک (rule.matchValue)، اگه
+     * imageTemplatePaths پر باشه، به همون ترتیب اولویت چک می‌کنه و اولین
+     * تطابق موفق رو برمی‌گردونه؛ وگرنه دقیقاً مثل فاز ۳-۸ فقط matchValue.
+     * این تابع همیشه از داخل imageMatchExecutor (ترد پس‌زمینه) صدا زده
+     * می‌شه، نه ترد اصلی.
+     */
+    private fun findImageMatchPoint(rule: ClickRule, frame: Bitmap): PointF? {
+        val paths = rule.imageTemplatePaths.ifEmpty { listOf(rule.matchValue) }
+        for (path in paths) {
+            val template = TemplateStore.loadTemplate(this, path) ?: run {
+                Log.w(TAG, "فایل الگوی تصویر پیدا نشد: $path")
+                null
+            } ?: continue
+            val match = ImageMatcher.findTemplate(frame, template, rule.threshold)
+            if (match != null) return match.center
+        }
+        return null
+    }
+
+    /** فاز ۹: تشخیص رنگ پیکسل در نقطه‌ای که rule.matchValue ("x,y") مشخص می‌کنه. */
+    private fun findPixelColorPoint(rule: ClickRule, frame: Bitmap): PointF? {
+        val parts = rule.matchValue.split(",")
+        val x = parts.getOrNull(0)?.trim()?.toIntOrNull() ?: return null
+        val y = parts.getOrNull(1)?.trim()?.toIntOrNull() ?: return null
+        val result = PixelColorMatcher.matches(frame, x, y, rule.targetColorHex, rule.colorTolerance) ?: return null
+        return PointF(result.x, result.y)
+    }
+
+    /**
+     * فاز ۹: OCR روی rule.ocrRegion (یا کل فریم) انجام می‌ده؛ اگه متن
+     * تشخیص‌داده‌شده شامل rule.matchValue بود (بدون حساسیت به بزرگ/کوچک)،
+     * نقطه‌ی کلیک رو برمی‌گردونه — یا rule.ocrClickPoint دستی، یا مرکز
+     * ocrRegion، یا مرکز کل صفحه اگه هیچ‌کدوم تعیین نشده بود.
+     */
+    private fun findOcrPoint(rule: ClickRule, frame: Bitmap): PointF? {
+        val text = OcrMatcher.recognizeRegion(frame, rule.ocrRegion, rule.ocrPreprocess) ?: return null
+        if (!text.contains(rule.matchValue, ignoreCase = true)) return null
+
+        val manualParts = rule.ocrClickPoint?.split(",")
+        val mx = manualParts?.getOrNull(0)?.trim()?.toFloatOrNull()
+        val my = manualParts?.getOrNull(1)?.trim()?.toFloatOrNull()
+        if (mx != null && my != null) return PointF(mx, my)
+
+        val regionParts = rule.ocrRegion?.split(",")?.mapNotNull { it.trim().toIntOrNull() }
+        return if (regionParts != null && regionParts.size == 4) {
+            PointF((regionParts[0] + regionParts[2]) / 2f, (regionParts[1] + regionParts[3]) / 2f)
+        } else {
+            PointF(frame.width / 2f, frame.height / 2f)
+        }
+    }
+
+    private fun centerOf(node: AccessibilityNodeInfo): PointF {
+        val bounds = Rect()
+        node.getBoundsInScreen(bounds)
+        return PointF(bounds.exactCenterX(), bounds.exactCenterY())
+    }
+
+    /**
+     * بهینه‌سازی/رفع نشتی: findAccessibilityNodeInfosByText/ByViewId (در
+     * matchRule) هر تیکِ حلقه‌ی کلیک صدا زده می‌شن و همیشه یک لیست کامل از
+     * نودهای منطبق برمی‌گردونن، ولی فقط اولین موردِ visible واقعاً استفاده
+     * می‌شه. قبلاً نه بقیه‌ی لیست و نه خودِ root (rootInActiveWindow) هیچ‌وقت
+     * recycle نمی‌شدن — روی هر loop tick. زیر اندروید ۱۳ که recycle() واقعاً
+     * اثر داره، این باعث تجمع پیوسته‌ی آبجکت‌های بومیِ accessibility در طول
+     * یک سشنِ طولانیِ حلقه‌ی کلیک می‌شد. باید بعد از این صدا زده بشه که دیگه
+     * از هیچ‌کدوم این نودها (شامل اونی که match شده) استفاده‌ای نیست — یعنی
+     * بعد از این‌که centerOf مختصات رو خونده.
+     */
+    private fun recycleNodesIfNeeded(nodes: List<AccessibilityNodeInfo>, root: AccessibilityNodeInfo?) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) return
+        for (n in nodes) {
+            @Suppress("DEPRECATION")
+            runCatching { n.recycle() }
+        }
+        @Suppress("DEPRECATION")
+        runCatching { root?.recycle() }
+    }
+
+    // ==================== فاز ۵: ضبط و پخش دقیق حرکات لمسی ====================
+
+    private fun pathFor(stroke: RecordedStroke): Path {
+        val pts = stroke.points
+        return Path().apply {
+            moveTo(pts.first().x, pts.first().y)
+            for (i in 1 until pts.size) lineTo(pts[i].x, pts[i].y)
+        }
+    }
+
+    /**
+     * یک استروک واحد (از یک DOWN تا یک UP) رو همین الان، با همون مسیر و
+     * همون مدت‌زمانی که ضبط شده، اجرا می‌کنه. دو مصرف داره: ۱) فوروارد
+     * زنده‌ی لمس حین ضبط (OverlayService) تا اپ زیرین هم واکنش نشون بده،
+     * ۲) تست سریع یک استروک تنها.
+     */
+    fun performRecordedStroke(stroke: RecordedStroke, onDone: ((Boolean) -> Unit)? = null) {
+        if (stroke.points.isEmpty()) { onDone?.invoke(false); return }
+        val firstPoint = stroke.points.first()
+        ClickMarkerOverlay.mark(this, firstPoint.x, firstPoint.y)
+        val gestureStroke = GestureDescription.StrokeDescription(
+            pathFor(stroke), 0, stroke.durationMs.coerceAtLeast(1L)
+        )
+        val gesture = GestureDescription.Builder().addStroke(gestureStroke).build()
+        dispatchGesture(gesture, object : GestureResultCallback() {
+            override fun onCompleted(gestureDescription: GestureDescription?) { onDone?.invoke(true) }
+            override fun onCancelled(gestureDescription: GestureDescription?) { onDone?.invoke(false) }
+        }, null)
+    }
+
+    /**
+     * کل یک Recording رو با همون فاصله‌های زمانیِ دقیقِ ضبط‌شده بین لمس‌ها
+     * پخش می‌کنه.
+     *
+     * یک GestureDescription واحد سقفی برای مدت کل و تعداد استروک‌های
+     * هم‌زمانش داره (خودِ سیستم‌عامل تعیین می‌کنه — از
+     * GestureDescription.getMaxGestureDuration/getMaxStrokeCount قابل‌خوندنه).
+     * برای همین، استروک‌ها رو به دسته‌های پشت‌سرهم می‌شکنیم: زمان‌بندیِ
+     * داخل هر دسته (startTime نسبیِ هر استروک نسبت به شروع همون دسته)
+     * دقیقاً همون چیزیه که ضبط شده؛ فقط دقیقاً سرِ مرز بین دو دسته (که
+     * عملاً فقط برای ضبط‌های خیلی طولانی/پرتراکم پیش میاد) ممکنه یک گسست
+     * فنیِ خیلی کوچیک وجود داشته باشه.
+     */
+    fun playRecording(recording: Recording, onFinished: (() -> Unit)? = null) {
+        val strokes = recording.strokes.filter { it.points.isNotEmpty() }
+        if (strokes.isEmpty()) { onFinished?.invoke(); return }
+
+        val maxDuration = GestureDescription.getMaxGestureDuration()
+        val maxStrokeCount = GestureDescription.getMaxStrokeCount()
+
+        class Batch(var baseOffset: Long) {
+            val strokes = mutableListOf<RecordedStroke>()
+        }
+
+        val batches = mutableListOf<Batch>()
+        var current = Batch(strokes.first().startTimeMs)
+        for (s in strokes) {
+            val relativeEnd = (s.startTimeMs - current.baseOffset) + s.durationMs
+            if (current.strokes.isNotEmpty() &&
+                (current.strokes.size >= maxStrokeCount || relativeEnd > maxDuration)
+            ) {
+                batches.add(current)
+                current = Batch(s.startTimeMs)
+            }
+            current.strokes.add(s)
+        }
+        if (current.strokes.isNotEmpty()) batches.add(current)
+
+        fun runBatch(index: Int) {
+            if (index >= batches.size) { onFinished?.invoke(); return }
+            val batch = batches[index]
+            val builder = GestureDescription.Builder()
+            for (s in batch.strokes) {
+                val startTime = (s.startTimeMs - batch.baseOffset).coerceAtLeast(0L)
+                val firstPoint = s.points.first()
+                ClickMarkerOverlay.mark(this@ClickAccessibilityService, firstPoint.x, firstPoint.y)
+                builder.addStroke(
+                    GestureDescription.StrokeDescription(pathFor(s), startTime, s.durationMs.coerceAtLeast(1L))
+                )
+            }
+            dispatchGesture(builder.build(), object : GestureResultCallback() {
+                override fun onCompleted(gestureDescription: GestureDescription?) { runBatch(index + 1) }
+                override fun onCancelled(gestureDescription: GestureDescription?) { runBatch(index + 1) }
+            }, null)
+        }
+
+        runBatch(0)
+    }
+}
