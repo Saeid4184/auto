@@ -8,7 +8,6 @@ import org.opencv.android.Utils
 import org.opencv.core.Core
 import org.opencv.core.CvType
 import org.opencv.core.Mat
-import org.opencv.core.MinMaxLocResult
 import org.opencv.imgproc.Imgproc
 
 /**
@@ -86,7 +85,7 @@ object ImageMatcher {
             // که برای صفحه‌ی گوشی (که روشنایی زیاد تغییر نمی‌کنه) مناسبه.
             Imgproc.matchTemplate(sceneMat, templateMat, resultMat, Imgproc.TM_CCOEFF_NORMED)
 
-            val mmr: MinMaxLocResult = Core.minMaxLoc(resultMat)
+            val mmr: Core.MinMaxLocResult = Core.minMaxLoc(resultMat)
             val confidence = mmr.maxVal
             if (confidence < threshold) return null
 
